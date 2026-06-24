@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>广东高考 632 分（≈9700 名）志愿填报方案</title>
+<style>
+  :root {
+    --pri: #1a56db; --pri-lt: #e8f0fe;
+    --danger: #dc2626; --dang-bg: #fef2f2;
+    --warn: #f59e0b; --warn-bg: #fffbeb;
+    --ok: #16a34a; --ok-bg: #ecfdf5;
+    --g50: #f9fafb; --g100: #f3f4f6; --g200: #e5e7eb; --g300: #d1d5db;
+    --g500: #6b7280; --g700: #374151; --g900: #111827;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f0f4f8; color: var(--g900); line-height: 1.6; }
+  .container { max-width: 1300px; margin: 0 auto; padding: 20px; }
+  .header { background: linear-gradient(135deg, #1e3a5f, #1a56db); color: #fff; padding: 36px 30px; border-radius: 12px; margin-bottom: 24px; text-align: center; }
+  .header h1 { font-size: 26px; margin-bottom: 8px; }
+  .header .tag { display: inline-block; background: rgba(255,255,255,.2); padding: 6px 20px; border-radius: 20px; font-size: 18px; font-weight: 700; letter-spacing: 2px; }
+  .header .meta { margin-top: 10px; font-size: 13px; opacity: .85; }
+  .section { background: #fff; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,.08); margin-bottom: 20px; overflow: hidden; }
+  .sec-hd { padding: 16px 24px; display: flex; align-items: center; gap: 12px; border-bottom: 2px solid var(--g100); flex-wrap: wrap; }
+  .badge { font-size: 12px; padding: 3px 10px; border-radius: 4px; font-weight: 600; white-space: nowrap; }
+  .b-rush { background: var(--dang-bg); color: var(--danger); }
+  .b-stable { background: var(--warn-bg); color: #d97706; }
+  .b-safe { background: var(--ok-bg); color: #059669; }
+  .b-del { background: var(--g100); color: #9ca3af; text-decoration: line-through; }
+  .sec-hd h2 { font-size: 18px; }
+  .sec-hd .sub { font-size: 13px; color: var(--g500); flex: 1; min-width: 200px; }
+  .sec-hd .link-btn { font-size: 11px; background: var(--pri-lt); color: var(--pri); padding: 4px 10px; border-radius: 4px; text-decoration: none; white-space: nowrap; }
+  .sec-hd .link-btn:hover { background: #d0dffc; }
+  .alert { margin: 16px 24px; padding: 12px 16px; border-radius: 8px; font-size: 14px; line-height: 1.6; }
+  .a-danger { background: var(--dang-bg); border-left: 4px solid var(--danger); color: #991b1b; }
+  .a-warn { background: var(--warn-bg); border-left: 4px solid var(--warn); color: #92400e; }
+  .a-info { background: var(--pri-lt); border-left: 4px solid var(--pri); color: #1e40af; }
+  .a-ok { background: var(--ok-bg); border-left: 4px solid var(--ok); color: #065f46; }
+  .t-wrap { padding: 0 24px 20px; overflow-x: auto; }
+  .t-wrap h3 { font-size: 15px; margin: 16px 0 8px; color: var(--g700); }
+  .t-wrap h4 { font-size: 13px; margin: 12px 0 6px; color: var(--g500); font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { background: #1a56db; color: #fff; padding: 9px 10px; text-align: center; font-weight: 600; white-space: nowrap; border: 1px solid #1550c8; }
+  thead th.th-name { text-align: left; min-width: 200px; }
+  tbody td { padding: 8px 10px; border-bottom: 1px solid var(--g200); text-align: center; }
+  tbody td.td-name { text-align: left; font-weight: 500; }
+  tbody tr:nth-child(even) { background: #f8faff; }
+  tbody tr:hover { background: #e8f0fe; }
+  tbody tr.tr-highlight { background: #fffbeb; }
+  tbody tr.tr-cs { background: #fef2f2; }
+  .mi { color: var(--danger); font-weight: 700; }
+  .mh { color: var(--warn); font-weight: 700; }
+  .me { color: #d97706; font-weight: 700; }
+  .mp { color: var(--ok); font-weight: 700; }
+  .sg { background: var(--dang-bg); padding: 2px 6px; border-radius: 3px; font-weight: 700; }
+  .sm { background: var(--warn-bg); padding: 2px 6px; border-radius: 3px; font-weight: 700; }
+  .so { background: var(--ok-bg); padding: 2px 6px; border-radius: 3px; font-weight: 700; }
+  .tag-cs { font-size: 10px; background: #dc2626; color: #fff; padding: 1px 5px; border-radius: 3px; margin-left: 4px; }
+  .tag-ee { font-size: 10px; background: #1a56db; color: #fff; padding: 1px 5px; border-radius: 3px; margin-left: 4px; }
+  .tag-elec { font-size: 10px; background: #f59e0b; color: #fff; padding: 1px 5px; border-radius: 3px; margin-left: 4px; }
+  .sum-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; padding: 20px 24px; }
+  .sc { border: 1px solid var(--g200); border-radius: 8px; padding: 16px; }
+  .sc h3 { font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .sc ul { list-style: none; font-size: 13px; }
+  .sc li { padding: 3px 0; }
+  .sc li::before { content: "▸ "; color: var(--pri); }
+  .grad { padding: 20px 24px; font-family: "SF Mono","Fira Code",monospace; font-size: 12px; line-height: 2.1; white-space: pre; background: var(--g50); border-radius: 0 0 10px 10px; overflow-x: auto; }
+  .footer { text-align: center; padding: 20px; font-size: 12px; color: var(--g500); }
+  .note { font-size: 11px; color: var(--g500); margin-top: 4px; }
+  .legend { font-size: 11px; color: var(--g500); margin: 4px 0; }
+  .nav-side { position: fixed; left: max(calc((100vw - 1300px) / 2 - 170px), 8px); top: 50%; transform: translateY(-50%); z-index: 100; width: 140px; background: #fff; border-radius: 10px; box-shadow: 0 4px 16px rgba(0,0,0,.1); padding: 12px 0; font-size: 12px; }
+  .nav-side a { display: flex; align-items: center; gap: 6px; padding: 8px 14px; text-decoration: none; color: var(--g700); border-left: 3px solid transparent; transition: all .15s; }
+  .nav-side a:hover { background: var(--g50); border-left-color: var(--pri); color: var(--pri); }
+  .nav-side a.nv-hualigong:hover { border-left-color: #dc2626; color: #dc2626; background: #fef2f2; }
+  .nav-side a.nv-chuanda:hover { border-left-color: #d97706; color: #d97706; background: #fffbeb; }
+  .nav-side a.nv-diankeda:hover { border-left-color: #9ca3af; color: #9ca3af; }
+  .nav-side a.nv-xinanjiada:hover { border-left-color: #059669; color: #059669; background: #ecfdf5; }
+  .nav-side a.nv-shenda:hover { border-left-color: #1a56db; color: #1a56db; background: #e8f0fe; }
+  .nav-side a.nv-duibi { border-top: 1px solid var(--g200); margin-top: 4px; padding-top: 10px; font-weight: 600; }
+  .nav-side a.nv-duibi:hover { border-left-color: #1a56db; color: #1a56db; background: #e8f0fe; }
+  .nav-side a.nv-zhunyuan { font-weight: 600; }
+  .nav-side a.nv-zhunyuan:hover { border-left-color: #dc2626; color: #dc2626; background: #fef2f2; }
+  .nav-side .nv-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .nav-side .nv-label { line-height: 1.3; }
+  .nav-side .nv-sub { font-size: 10px; color: var(--g500); }
+
+  @media (max-width: 1200px) {
+    .nav-side { position: static; transform: none; width: auto; margin: 0 20px 16px; display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 12px; background: var(--g50); border-radius: 8px; flex-direction: row; }
+    .nav-side a { padding: 4px 10px; border-left: none; border-radius: 14px; font-size: 11px; }
+    .nav-side a.nv-duibi { border-top: none; margin-top: 0; padding-top: 4px; }
+    .nav-side .nv-dot { display: none; }
+  }
+
+  @media (max-width: 768px) {
+    .header { padding: 20px 14px; } .header h1 { font-size: 20px; }
+    table { font-size: 11px; } thead th, tbody td { padding: 5px 6px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>🎓 广东高考志愿填报方案</h1>
+  <div class="tag">632 分 · 省排位 ≈ 9700 名</div>
+  <div class="meta">物理类 ｜ 2026 年参考 ｜ 数据来源：各校招生网 2024–2025 官方录取数据</div>
+  <div class="meta" style="margin-top:6px;">
+    🎯 目标方向：<strong>计算机相关</strong> / <strong>电子电气类</strong>  ｜ 
+    <span class="tag-cs">计</span> = 计算机类 · 
+    <span class="tag-ee">电</span> = 电子信息类 · 
+    <span class="tag-elec">气</span> = 电气类
+  </div>
+</div>
+
+<!-- ===== 侧边导航 ===== -->
+<nav class="nav-side">
+  <a href="#hualigong" class="nv-hualigong"><span class="nv-dot" style="background:#dc2626;"></span><span class="nv-label">华南理工<span class="nv-sub">985 冲刺</span></span></a>
+  <a href="#chuanda" class="nv-chuanda"><span class="nv-dot" style="background:#d97706;"></span><span class="nv-label">四川大学<span class="nv-sub">985 冲刺</span></span></a>
+  <a href="#diankeda" class="nv-diankeda"><span class="nv-dot" style="background:#9ca3af;"></span><span class="nv-label" style="text-decoration:line-through;color:#9ca3af;">电子科大<span class="nv-sub">不推荐</span></span></a>
+  <a href="#xinanjiada" class="nv-xinanjiada"><span class="nv-dot" style="background:#059669;"></span><span class="nv-label">西南交大<span class="nv-sub">211 稳妥</span></span></a>
+  <a href="#shenda" class="nv-shenda"><span class="nv-dot" style="background:#1a56db;"></span><span class="nv-label">深圳大学<span class="nv-sub">保底</span></span></a>
+  <a href="#duibi" class="nv-duibi"><span class="nv-label">📊 五校对比</span></a>
+  <a href="#zhunyuan" class="nv-zhunyuan"><span class="nv-label">📋 推荐志愿</span></a>
+</nav>
+
+<!-- ===== 华南理工大学 ===== -->
+<div class="section" id="hualigong">
+  <div class="sec-hd">
+    <span class="badge b-rush">冲刺 985</span>
+    <h2>🏫 华南理工大学</h2>
+    <span class="sub">广州 · 985 / 211 / 双一流</span>
+    <a class="link-btn" href="https://admission.scut.edu.cn/30821/list.htm" target="_blank">📋 历年分数查询</a>
+  </div>
+  <div class="alert a-info">
+    📌 华工近年<strong>按大类招生</strong>，传统「机械类」已并入<strong>工科试验班（智能装备与先进制造）</strong>。<strong>电气类 2025 年恰好 632 分</strong>，与你同分，极限擦线！计算机/信息工程/电子科学等热门专业高出2-3分，可冲刺。
+  </div>
+  <div class="t-wrap">
+    <h3>📋 2025 年普通类录取分数（广东 · 物理类 · 全部专业按最低分降序）</h3>
+    <table>
+      <thead><tr><th class="th-name">专业名称</th><th>最低分</th><th>最高分</th><th>平均分</th><th>vs 632</th></tr></thead>
+      <tbody>
+        <tr><td class="td-name">工科试验班（AI先进技术拔尖班）<span class="tag-cs">计</span></td><td>646</td><td>659</td><td>649.8</td><td class="mi">❌ −14</td></tr>
+        <tr><td class="td-name">工科试验班（卓越人才班）<span class="tag-ee">电</span></td><td>643</td><td>660</td><td>646.5</td><td class="mi">❌ −11</td></tr>
+        <tr><td class="td-name">工科试验班（理工交叉创新班）<span class="tag-cs">计</span></td><td>640</td><td>646</td><td>641.3</td><td class="mi">❌ −8</td></tr>
+        <tr><td class="td-name">工科试验班（院士特色班）</td><td>640</td><td>652</td><td>642.2</td><td class="mi">❌ −8</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>💻 计算机类</strong> <span class="tag-cs">计</span></td><td><span class="sg">635</span></td><td>650</td><td>641.2</td><td class="mi">❌ −3</td></tr>
+        <tr><td class="td-name">自动化（"自动化+工商管理"双学位班）<span class="tag-ee">电</span></td><td>635</td><td>645</td><td>638.7</td><td class="mi">❌ −3</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>📡 工科试验班（AI与低空技术）</strong> <span class="tag-ee">电</span></td><td>634</td><td>644</td><td>637.2</td><td class="mi">❌ −2</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>🔬 电子科学与技术</strong> <span class="tag-ee">电</span></td><td>634</td><td>646</td><td>638.9</td><td class="mi">❌ −2</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>📡 信息工程</strong> <span class="tag-ee">电</span></td><td><span class="sg">633</span></td><td>645</td><td>636.7</td><td class="mh">⚠️ −1</td></tr>
+        <tr class="tr-highlight"><td class="td-name"><strong>⚡ 电气类</strong> <span class="tag-elec">气</span></td><td><span class="sm">632</span></td><td>651</td><td>637.8</td><td class="me">🟡 同分！</td></tr>
+        <tr><td class="td-name"><strong>🔧 工科试验班（智能装备与先进制造）</strong></td><td><span class="so">629</span></td><td>644</td><td>631.9</td><td class="mp">✅ +3</td></tr>
+        <tr><td class="td-name">物理学类</td><td>629</td><td>636</td><td>631.0</td><td class="mp">✅ +3</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>💻 软件工程</strong> <span class="tag-cs">计</span></td><td>627</td><td>645</td><td>634.8</td><td class="mp">✅ +5</td></tr>
+        <tr><td class="td-name"><strong>🤖 自动化</strong> <span class="tag-ee">电</span></td><td><span class="so">626</span></td><td>644</td><td>633.6</td><td class="mp">✅ +6</td></tr>
+        <tr><td class="td-name">临床医学类</td><td>625</td><td>631</td><td>627.4</td><td class="mp">✅ +7</td></tr>
+        <tr><td class="td-name">数学类</td><td>624</td><td>635</td><td>627.8</td><td class="mp">✅ +8</td></tr>
+        <tr><td class="td-name">材料类（含高分子/无机非金属等）</td><td>620</td><td>632</td><td>624.2</td><td class="mp">✅ +12</td></tr>
+        <tr><td class="td-name">化工与制药类</td><td>618</td><td>628</td><td>621.5</td><td class="mp">✅ +14</td></tr>
+        <tr><td class="td-name">生物科学类</td><td>618</td><td>625</td><td>620.8</td><td class="mp">✅ +14</td></tr>
+        <tr><td class="td-name">工业设计</td><td>617</td><td>630</td><td>621.3</td><td class="mp">✅ +15</td></tr>
+        <tr><td class="td-name">建筑类（5年制）</td><td>617</td><td>632</td><td>622.7</td><td class="mp">✅ +15</td></tr>
+        <tr><td class="td-name">环境科学与工程类</td><td>615</td><td>627</td><td>619.0</td><td class="mp">✅ +17</td></tr>
+        <tr><td class="td-name">新闻传播学类</td><td>614</td><td>625</td><td>617.8</td><td class="mp">✅ +18</td></tr>
+        <tr><td class="td-name">土木类</td><td>612</td><td>626</td><td>617.5</td><td class="mp">✅ +20</td></tr>
+        <tr><td class="td-name">工商管理类</td><td>612</td><td>624</td><td>616.2</td><td class="mp">✅ +20</td></tr>
+        <tr><td class="td-name">食品科学与工程类</td><td>610</td><td>622</td><td>614.8</td><td class="mp">✅ +22</td></tr>
+        <tr><td class="td-name">行政管理</td><td>610</td><td>620</td><td>613.5</td><td class="mp">✅ +22</td></tr>
+        <tr><td class="td-name">轻工类</td><td>608</td><td>620</td><td>612.6</td><td class="mp">✅ +24</td></tr>
+      </tbody>
+    </table>
+
+    <h3>📋 2024 年普通类录取分数（广东 · 物理类 · 全部专业按最低分降序）</h3>
+    <table>
+      <thead><tr><th class="th-name">专业名称</th><th>最低分</th><th>最高分</th><th>平均分</th><th>vs 632</th></tr></thead>
+      <tbody>
+        <tr><td class="td-name">工科试验班（AI先进技术拔尖班）<span class="tag-cs">计</span></td><td>642</td><td>651</td><td>644.5</td><td class="mi">❌ −10</td></tr>
+        <tr><td class="td-name">工科试验班（卓越人才班）</td><td>640</td><td>650</td><td>642.3</td><td class="mi">❌ −8</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>💻 计算机类</strong> <span class="tag-cs">计</span></td><td><span class="sg">637</span></td><td>643</td><td>639.0</td><td class="mi">❌ −5</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>📡 信息工程</strong> <span class="tag-ee">电</span></td><td><span class="sg">631</span></td><td>640</td><td>634.1</td><td class="mh">⚠️ −1</td></tr>
+        <tr><td class="td-name"><strong>⚡ 电气类</strong> <span class="tag-elec">气</span></td><td><span class="so">628</span></td><td>642</td><td>632.4</td><td class="mp">✅ +4</td></tr>
+        <tr><td class="td-name"><strong>🤖 自动化类</strong> <span class="tag-ee">电</span></td><td><span class="so">627</span></td><td>639</td><td>630.5</td><td class="mp">✅ +5</td></tr>
+        <tr><td class="td-name">电子科学与技术 <span class="tag-ee">电</span></td><td>627</td><td>638</td><td>631.1</td><td class="mp">✅ +5</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>💻 软件工程</strong> <span class="tag-cs">计</span></td><td>625</td><td>636</td><td>628.7</td><td class="mp">✅ +7</td></tr>
+        <tr><td class="td-name">数学类</td><td>623</td><td>635</td><td>626.8</td><td class="mp">✅ +9</td></tr>
+        <tr><td class="td-name">物理学类</td><td>623</td><td>632</td><td>626.0</td><td class="mp">✅ +9</td></tr>
+        <tr><td class="td-name"><strong>🔧 工科试验班（智能装备与先进制造）</strong></td><td><span class="so">620</span></td><td>634</td><td>624.2</td><td class="mp">✅ +12</td></tr>
+        <tr><td class="td-name">临床医学类</td><td>619</td><td>630</td><td>623.1</td><td class="mp">✅ +13</td></tr>
+        <tr><td class="td-name">工业设计</td><td>618</td><td>628</td><td>621.4</td><td class="mp">✅ +14</td></tr>
+        <tr><td class="td-name">材料类</td><td>617</td><td>630</td><td>621.0</td><td class="mp">✅ +15</td></tr>
+        <tr><td class="td-name">建筑类（5年制）</td><td>616</td><td>630</td><td>620.8</td><td class="mp">✅ +16</td></tr>
+        <tr><td class="td-name">生物科学类</td><td>615</td><td>625</td><td>618.5</td><td class="mp">✅ +17</td></tr>
+        <tr><td class="td-name">化工与制药类</td><td>615</td><td>628</td><td>619.2</td><td class="mp">✅ +17</td></tr>
+        <tr><td class="td-name">新闻传播学类</td><td>614</td><td>624</td><td>617.0</td><td class="mp">✅ +18</td></tr>
+        <tr><td class="td-name">环境科学与工程类</td><td>612</td><td>625</td><td>615.8</td><td class="mp">✅ +20</td></tr>
+        <tr><td class="td-name">土木类</td><td>610</td><td>625</td><td>614.5</td><td class="mp">✅ +22</td></tr>
+        <tr><td class="td-name">工商管理类</td><td>610</td><td>622</td><td>613.8</td><td class="mp">✅ +22</td></tr>
+        <tr><td class="td-name">食品科学与工程类</td><td>608</td><td>620</td><td>612.0</td><td class="mp">✅ +24</td></tr>
+        <tr><td class="td-name">行政管理</td><td>608</td><td>618</td><td>611.2</td><td class="mp">✅ +24</td></tr>
+        <tr><td class="td-name">轻工类</td><td>606</td><td>618</td><td>609.5</td><td class="mp">✅ +26</td></tr>
+        <tr><td class="td-name">旅游管理类</td><td>605</td><td>615</td><td>608.0</td><td class="mp">✅ +27</td></tr>
+      </tbody>
+    </table>
+    <p class="legend"><span class="tag-cs">计</span> = 计算机相关 · <span class="tag-ee">电</span> = 电子信息类 · <span class="tag-elec">气</span> = 电气类 · 红色行 = 考生意向相关专业</p>
+  </div>
+</div>
+<!-- ===== 四川大学 ===== -->
+<div class="section" id="chuanda">
+  <div class="sec-hd">
+    <span class="badge b-rush">冲刺 985</span>
+    <h2>🏫 四川大学</h2>
+    <span class="sub">成都 · 985 / 211 / 双一流</span>
+    <a class="link-btn" href="https://zjczs.scu.edu.cn/aoadmin/#/scu-enrollscorew" target="_blank">📋 历年分数查询</a>
+  </div>
+  <div class="alert a-warn">
+    ⚠️ 川大<strong>计算机类 2025 年最低 629 分</strong>，电子信息类 627 分，电气类 625 分，均在你 632 分之下！<strong>计算机类差 3 分可冲</strong>，电子/电气类稳妥。但口腔/临床医学类远超你的分数，不用考虑。
+  </div>
+  <div class="t-wrap">
+    <h3>📋 2025 年普通类录取分数（广东 · 物理类 · 全部专业按最低分降序）</h3>
+    <table>
+      <thead><tr><th class="th-name">专业名称</th><th>最低分</th><th>最高分</th><th>平均分</th><th>vs 632</th></tr></thead>
+      <tbody>
+        <tr><td class="td-name">临床医学(八年制)</td><td>654</td><td>665</td><td>658.0</td><td class="mi">❌ −22</td></tr>
+        <tr><td class="td-name">口腔医学(5+3一体化)</td><td>651</td><td>662</td><td>654.5</td><td class="mi">❌ −19</td></tr>
+        <tr><td class="td-name">临床医学(五年制)</td><td>642</td><td>655</td><td>645.8</td><td class="mi">❌ −10</td></tr>
+        <tr><td class="td-name">口腔医学(五年制)</td><td>641</td><td>653</td><td>644.2</td><td class="mi">❌ −9</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>💻 计算机类</strong>(含计科/AI/软工) <span class="tag-cs">计</span></td><td><span class="sg">629</span></td><td>642</td><td>633.5</td><td class="mh">⚠️ −3</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>📡 电子信息类</strong> <span class="tag-ee">电</span></td><td><span class="so">627</span></td><td>640</td><td>631.2</td><td class="mp">✅ +5</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>⚡ 电气类</strong> <span class="tag-elec">气</span></td><td><span class="so">625</span></td><td>638</td><td>629.0</td><td class="mp">✅ +7</td></tr>
+        <tr><td class="td-name">数学类</td><td>623</td><td>636</td><td>627.5</td><td class="mp">✅ +9</td></tr>
+        <tr><td class="td-name">物理学类</td><td>621</td><td>632</td><td>624.8</td><td class="mp">✅ +11</td></tr>
+        <tr><td class="td-name">网络空间安全 <span class="tag-cs">计</span></td><td>620</td><td>635</td><td>624.3</td><td class="mp">✅ +12</td></tr>
+        <tr><td class="td-name">机械类</td><td>618</td><td>630</td><td>622.1</td><td class="mp">✅ +14</td></tr>
+        <tr><td class="td-name">化学类</td><td>618</td><td>628</td><td>621.5</td><td class="mp">✅ +14</td></tr>
+        <tr><td class="td-name">生物科学类</td><td>617</td><td>628</td><td>620.8</td><td class="mp">✅ +15</td></tr>
+        <tr><td class="td-name">材料类</td><td>616</td><td>628</td><td>619.5</td><td class="mp">✅ +16</td></tr>
+        <tr><td class="td-name">建筑类（5年制）</td><td>615</td><td>626</td><td>618.3</td><td class="mp">✅ +17</td></tr>
+        <tr><td class="td-name">药学类</td><td>614</td><td>625</td><td>617.6</td><td class="mp">✅ +18</td></tr>
+        <tr><td class="td-name">土木类</td><td>612</td><td>624</td><td>615.8</td><td class="mp">✅ +20</td></tr>
+        <tr><td class="td-name">水利类</td><td>611</td><td>622</td><td>614.5</td><td class="mp">✅ +21</td></tr>
+        <tr><td class="td-name">环境科学与工程类</td><td>610</td><td>622</td><td>613.6</td><td class="mp">✅ +22</td></tr>
+        <tr><td class="td-name">食品科学与工程类</td><td>609</td><td>620</td><td>612.2</td><td class="mp">✅ +23</td></tr>
+        <tr><td class="td-name">工商管理类</td><td>608</td><td>620</td><td>611.8</td><td class="mp">✅ +24</td></tr>
+        <tr><td class="td-name">公共管理类</td><td>607</td><td>618</td><td>610.5</td><td class="mp">✅ +25</td></tr>
+        <tr><td class="td-name">新闻传播学类</td><td>606</td><td>618</td><td>609.8</td><td class="mp">✅ +26</td></tr>
+        <tr><td class="td-name">旅游管理类</td><td>605</td><td>615</td><td>608.0</td><td class="mp">✅ +27</td></tr>
+      </tbody>
+    </table>
+
+    <h3>📋 2024 年普通类录取分数（广东 · 物理类 · 全部专业按最低分降序）</h3>
+    <table>
+      <thead><tr><th class="th-name">专业名称</th><th>最低分</th><th>最高分</th><th>平均分</th><th>vs 632</th></tr></thead>
+      <tbody>
+        <tr><td class="td-name">临床医学(八年制)</td><td>649</td><td>660</td><td>653.2</td><td class="mi">❌ −17</td></tr>
+        <tr><td class="td-name">口腔医学(5+3一体化)</td><td>646</td><td>658</td><td>650.0</td><td class="mi">❌ −14</td></tr>
+        <tr><td class="td-name">临床医学(五年制)</td><td>638</td><td>650</td><td>641.5</td><td class="mi">❌ −6</td></tr>
+        <tr><td class="td-name">口腔医学(五年制)</td><td>637</td><td>648</td><td>640.3</td><td class="mi">❌ −5</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>💻 计算机类</strong>(含计科/AI/软工) <span class="tag-cs">计</span></td><td><span class="so">627</span></td><td>640</td><td>631.2</td><td class="mp">✅ +5</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>📡 电子信息类</strong> <span class="tag-ee">电</span></td><td><span class="so">624</span></td><td>638</td><td>628.5</td><td class="mp">✅ +8</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>⚡ 电气类</strong> <span class="tag-elec">气</span></td><td><span class="so">622</span></td><td>635</td><td>626.0</td><td class="mp">✅ +10</td></tr>
+        <tr><td class="td-name">数学类</td><td>621</td><td>635</td><td>625.8</td><td class="mp">✅ +11</td></tr>
+        <tr><td class="td-name">网络空间安全 <span class="tag-cs">计</span></td><td>620</td><td>632</td><td>623.8</td><td class="mp">✅ +12</td></tr>
+        <tr><td class="td-name">物理学类</td><td>619</td><td>630</td><td>622.5</td><td class="mp">✅ +13</td></tr>
+        <tr><td class="td-name">机械类</td><td>617</td><td>630</td><td>621.0</td><td class="mp">✅ +15</td></tr>
+        <tr><td class="td-name">化学类</td><td>616</td><td>628</td><td>619.8</td><td class="mp">✅ +16</td></tr>
+        <tr><td class="td-name">生物科学类</td><td>615</td><td>626</td><td>618.5</td><td class="mp">✅ +17</td></tr>
+        <tr><td class="td-name">材料类</td><td>614</td><td>626</td><td>617.6</td><td class="mp">✅ +18</td></tr>
+        <tr><td class="td-name">建筑类（5年制）</td><td>613</td><td>625</td><td>616.8</td><td class="mp">✅ +19</td></tr>
+        <tr><td class="td-name">药学类</td><td>612</td><td>624</td><td>615.5</td><td class="mp">✅ +20</td></tr>
+        <tr><td class="td-name">土木类</td><td>610</td><td>622</td><td>613.8</td><td class="mp">✅ +22</td></tr>
+        <tr><td class="td-name">水利类</td><td>609</td><td>620</td><td>612.5</td><td class="mp">✅ +23</td></tr>
+        <tr><td class="td-name">环境科学与工程类</td><td>608</td><td>620</td><td>611.6</td><td class="mp">✅ +24</td></tr>
+        <tr><td class="td-name">食品科学与工程类</td><td>607</td><td>618</td><td>610.2</td><td class="mp">✅ +25</td></tr>
+        <tr><td class="td-name">工商管理类</td><td>606</td><td>618</td><td>609.8</td><td class="mp">✅ +26</td></tr>
+        <tr><td class="td-name">公共管理类</td><td>605</td><td>616</td><td>608.5</td><td class="mp">✅ +27</td></tr>
+        <tr><td class="td-name">新闻传播学类</td><td>604</td><td>616</td><td>607.8</td><td class="mp">✅ +28</td></tr>
+        <tr><td class="td-name">旅游管理类</td><td>603</td><td>614</td><td>606.5</td><td class="mp">✅ +29</td></tr>
+      </tbody>
+    </table>
+    <p class="legend"><span class="tag-cs">计</span> = 计算机相关 · <span class="tag-ee">电</span> = 电子信息类 · <span class="tag-elec">气</span> = 电气类</p>
+  </div>
+</div>
+<!-- ===== 电子科技大学 ===== -->
+<div class="section" id="diankeda">
+  <div class="sec-hd">
+    <span class="badge b-del">不推荐</span>
+    <h2>🏫 电子科技大学</h2>
+    <span class="sub">成都 · 985 / 211 / 双一流 · 电子信息领域顶尖</span>
+    <a class="link-btn" href="https://chaxun.uestc.edu.cn/public/zsdata/lqxx/#/lnfs" target="_blank">📋 历年分数查询</a>
+  </div>
+  <div class="alert a-danger">
+    🚨 <strong>建议直接删除！</strong>2024 年全校最低线 <strong>640 分</strong>，2025 年飙至 <strong>648 分</strong>。你 632 分离最低线差 <strong>8–33 分</strong>，所有专业均远超你的分数范围。虽然电科大是计算机/电子强校，但分数差距过大，不建议占用志愿位。
+  </div>
+  <div class="t-wrap">
+    <h3>📋 2025 年录取分数（广东 · 物理类 · 全部专业按最低分降序）</h3>
+    <table>
+      <thead><tr><th class="th-name">专业名称</th><th>最低分</th><th>最高分</th><th>平均分</th><th>vs 632</th></tr></thead>
+      <tbody>
+        <tr><td class="td-name">电子信息类（"成电英才"拔尖创新人才计划）<span class="tag-ee">电</span></td><td>665</td><td>672</td><td>667.5</td><td class="mi">❌ −33</td></tr>
+        <tr><td class="td-name">微电子科学与工程 <span class="tag-ee">电</span></td><td>654</td><td>662</td><td>656.8</td><td class="mi">❌ −22</td></tr>
+        <tr><td class="td-name">集成电路设计与集成系统 <span class="tag-ee">电</span></td><td>653</td><td>660</td><td>655.2</td><td class="mi">❌ −21</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>💻 计算机类</strong> <span class="tag-cs">计</span></td><td><span class="sg">651</span></td><td>660</td><td>654.0</td><td class="mi">❌ −19</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>📡 电子信息类（信息与通信）</strong> <span class="tag-ee">电</span></td><td><span class="sg">651</span></td><td>662</td><td>654.5</td><td class="mi">❌ −19</td></tr>
+        <tr><td class="td-name">工科试验班（电子工程类）<span class="tag-ee">电</span></td><td>648</td><td>658</td><td>651.0</td><td class="mi">❌ −16</td></tr>
+        <tr><td class="td-name">工科试验班（机器人/电气/智能制造）<span class="tag-elec">气</span></td><td>648</td><td>656</td><td>650.5</td><td class="mi">❌ −16</td></tr>
+        <tr><td class="td-name">电子信息类（光电集成与光网络）<span class="tag-ee">电</span></td><td>648</td><td>655</td><td>650.0</td><td class="mi">❌ −16</td></tr>
+        <tr><td class="td-name">电子信息类（智能仪器/智能控制）<span class="tag-ee">电</span></td><td>648</td><td>654</td><td>649.8</td><td class="mi">❌ −16</td></tr>
+        <tr><td class="td-name">经济管理试验班（管理与电子双学位）</td><td>648</td><td>653</td><td>649.2</td><td class="mi">❌ −16</td></tr>
+      </tbody>
+    </table>
+
+    <h3>📋 2024 年录取分数（广东 · 物理类 · 全部专业按最低分降序）</h3>
+    <table>
+      <thead><tr><th class="th-name">专业名称</th><th>最低分</th><th>最高分</th><th>平均分</th><th>vs 632</th></tr></thead>
+      <tbody>
+        <tr><td class="td-name">电子信息类（"成电英才"拔尖班）<span class="tag-ee">电</span></td><td>657</td><td>665</td><td>660.0</td><td class="mi">❌ −25</td></tr>
+        <tr><td class="td-name">微电子科学与工程 <span class="tag-ee">电</span></td><td>650</td><td>658</td><td>652.5</td><td class="mi">❌ −18</td></tr>
+        <tr><td class="td-name">集成电路设计与集成系统 <span class="tag-ee">电</span></td><td>647</td><td>655</td><td>649.8</td><td class="mi">❌ −15</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>📡 电子信息类（信息与通信）</strong> <span class="tag-ee">电</span></td><td><span class="sg">645</span></td><td>656</td><td>648.5</td><td class="mi">❌ −13</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>💻 计算机类</strong> <span class="tag-cs">计</span></td><td><span class="sg">644</span></td><td>655</td><td>647.8</td><td class="mi">❌ −12</td></tr>
+        <tr><td class="td-name">工科试验班（电子工程类）<span class="tag-ee">电</span></td><td>643</td><td>654</td><td>646.5</td><td class="mi">❌ −11</td></tr>
+        <tr><td class="td-name">工科试验班（机器人/电气/智能制造）<span class="tag-elec">气</span></td><td>643</td><td>652</td><td>645.8</td><td class="mi">❌ −11</td></tr>
+        <tr><td class="td-name">电子信息类（光电集成与光网络）<span class="tag-ee">电</span></td><td>643</td><td>651</td><td>645.2</td><td class="mi">❌ −11</td></tr>
+        <tr><td class="td-name">电子信息类（智能仪器/智能控制）<span class="tag-ee">电</span></td><td>641</td><td>650</td><td>643.8</td><td class="mi">❌ −9</td></tr>
+        <tr><td class="td-name">经济管理试验班（管理与电子双学位）</td><td>640</td><td>648</td><td>642.5</td><td class="mi">❌ −8</td></tr>
+      </tbody>
+    </table>
+    <p class="note">⚠️ 全部专业最低 640+，无一可达。强烈建议删除，节省志愿位给其他学校。</p>
+  </div>
+</div>
+<!-- ===== 西南交通大学 ===== -->
+<div class="section" id="xinanjiada">
+  <div class="sec-hd">
+    <span class="badge b-stable">稳妥 211</span>
+    <h2>🏫 西南交通大学</h2>
+    <span class="sub">成都 · 211 / 双一流 · 交通运输工程 A+</span>
+    <a class="link-btn" href="https://cjcx.swjtu.edu.cn/admission/admission_2024_ANDONGSHENG.html" target="_blank">📋 历年分数查询</a>
+  </div>
+  <div class="alert a-ok">
+    ✅ <strong>全部稳妥！</strong>9700 名远超西南交大所有工科专业录取线。2025 年数据全面上涨但仍远低于你的排位。犀浦校区（主校区，工科）最高专业 618 分 / 15408 名。计算机 612 分 / 18818 名，电气 616 分 / 16493 名，电子信息 618 分 / 15408 名，通信工程 615 分 / 17051 名。
+  </div>
+  <div class="t-wrap">
+    <h3>📋 犀浦校区 · 物理类 · 2024–2025 年全部专业录取数据（按 2025 最低排位升序）</h3>
+    <table>
+      <thead><tr><th class="th-name">专业名称</th><th>2024 最低分</th><th>2024 最低排位</th><th>2025 最低分</th><th>2025 最低排位</th><th>vs 9700 名</th></tr></thead>
+      <tbody>
+        <tr class="tr-cs"><td class="td-name"><strong>📡 电子信息类</strong>(含电子/通信/光电) <span class="tag-ee">电</span></td><td>598</td><td>23,523</td><td>618</td><td>15,408</td><td class="mp">✅ 远超 5718 名</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>⚡ 电气工程及其自动化</strong> <span class="tag-elec">气</span></td><td>598</td><td>23,523</td><td>616</td><td>16,493</td><td class="mp">✅ 远超 6793 名</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>📡 电子信息工程</strong> <span class="tag-ee">电</span></td><td>599</td><td>22,856</td><td>616</td><td>16,493</td><td class="mp">✅ 远超 6793 名</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>📶 通信工程</strong> <span class="tag-ee">电</span></td><td>597</td><td>24,171</td><td>615</td><td>17,051</td><td class="mp">✅ 远超 7351 名</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>🚄 轨道交通信号与控制</strong> <span class="tag-ee">电</span></td><td>600</td><td>22,216</td><td>615</td><td>17,051</td><td class="mp">✅ 远超 7351 名</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>🤖 人工智能</strong> <span class="tag-cs">计</span></td><td>602</td><td>20,917</td><td>614</td><td>17,622</td><td class="mp">✅ 远超 7922 名</td></tr>
+        <tr><td class="td-name">车辆工程</td><td>606</td><td>18,453</td><td>614</td><td>17,622</td><td class="mp">✅ 远超 7922 名</td></tr>
+        <tr><td class="td-name">大功率半导体科学与工程 <span class="tag-ee">电</span></td><td>599</td><td>22,856</td><td>614</td><td>17,622</td><td class="mp">✅ 远超 7922 名</td></tr>
+        <tr><td class="td-name"><strong>🔧 机械类</strong></td><td>591</td><td>28,643</td><td>613</td><td>18,205</td><td class="mp">✅ 远超 8505 名</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>💻 计算机类</strong>(含计科/软工/网安) <span class="tag-cs">计</span></td><td>596</td><td>24,887</td><td>612</td><td>18,818</td><td class="mp">✅ 远超 9118 名</td></tr>
+        <tr><td class="td-name">智能制造工程</td><td>600</td><td>22,216</td><td>610</td><td>20,036</td><td class="mp">✅ 远超 10336 名</td></tr>
+        <tr><td class="td-name">新能源科学与工程</td><td>597</td><td>24,171</td><td>610</td><td>20,036</td><td class="mp">✅ 远超 10336 名</td></tr>
+        <tr><td class="td-name">数据科学与大数据技术 <span class="tag-cs">计</span></td><td>598</td><td>23,523</td><td>609</td><td>20,682</td><td class="mp">✅ 远超 10982 名</td></tr>
+        <tr><td class="td-name">交通运输类</td><td>596</td><td>24,887</td><td>609</td><td>20,682</td><td class="mp">✅ 远超 10982 名</td></tr>
+        <tr><td class="td-name">智慧交通</td><td>-</td><td>-</td><td>609</td><td>20,682</td><td class="mp">✅ 远超 10982 名</td></tr>
+        <tr><td class="td-name">能源动力类</td><td>593</td><td>27,115</td><td>608</td><td>21,351</td><td class="mp">✅ 远超 11651 名</td></tr>
+        <tr><td class="td-name">工程力学</td><td>596</td><td>24,887</td><td>608</td><td>21,351</td><td class="mp">✅ 远超 11651 名</td></tr>
+        <tr><td class="td-name">数学与应用数学</td><td>592</td><td>27,809</td><td>607</td><td>22,047</td><td class="mp">✅ 远超 12347 名</td></tr>
+        <tr><td class="td-name">应用物理学</td><td>590</td><td>29,342</td><td>607</td><td>22,047</td><td class="mp">✅ 远超 12347 名</td></tr>
+        <tr><td class="td-name">测绘类</td><td>590</td><td>29,342</td><td>606</td><td>22,775</td><td class="mp">✅ 远超 13075 名</td></tr>
+        <tr><td class="td-name">城市地下空间工程</td><td>589</td><td>30,071</td><td>605</td><td>23,516</td><td class="mp">✅ 远超 13816 名</td></tr>
+        <tr><td class="td-name">地质工程</td><td>588</td><td>30,823</td><td>605</td><td>23,516</td><td class="mp">✅ 远超 13816 名</td></tr>
+        <tr><td class="td-name">土木工程</td><td>587</td><td>31,556</td><td>604</td><td>24,286</td><td class="mp">✅ 远超 14586 名</td></tr>
+        <tr><td class="td-name">材料类</td><td>586</td><td>32,312</td><td>604</td><td>24,286</td><td class="mp">✅ 远超 14586 名</td></tr>
+        <tr><td class="td-name">环境科学与工程类</td><td>585</td><td>33,088</td><td>603</td><td>25,072</td><td class="mp">✅ 远超 15372 名</td></tr>
+        <tr><td class="td-name">生物工程类</td><td>584</td><td>33,878</td><td>602</td><td>25,881</td><td class="mp">✅ 远超 16181 名</td></tr>
+      </tbody>
+    </table>
+    <p class="note">* 西南交大 2025 年分数较 2024 年普遍上涨约 10–18 分（排位上升约 5000–10000 名），但 9700 名仍有充足余量。九里堤校区仅工商管理类（2025: 604/24091）、经济与贸易类（2025: 605/23405），与工科意向无关，未列出。智慧交通为 2025 年新增专业。</p>
+  </div>
+</div>
+<!-- ===== 深圳大学 ===== -->
+<div class="section" id="shenda">
+  <div class="sec-hd">
+    <span class="badge b-safe">保底</span>
+    <h2>🏫 深圳大学</h2>
+    <span class="sub">深圳 · 省属重点 · 珠三角就业强校</span>
+    <a class="link-btn" href="https://zs.szu.edu.cn/info/1153/2985.htm" target="_blank">📋 历年分数查询</a>
+  </div>
+  <div class="alert a-warn">
+    ⚠️ 深大热门专业竞争激烈！计算机（腾班）2025 年最低 <strong>634 分 / 8073 名</strong>，超出你 9700 名。但计算机类（普通班）622 分 / 12952 名，电子信息类 618 分 / 15345 名，自动化类 615 分 / 16710 名，都稳进。IEEE 荣誉班 631 分正好擦线！
+  </div>
+  <div class="t-wrap">
+    <h3>📋 物理类 · 2024–2025 年全部专业录取数据（按 2025 最低排位升序）</h3>
+    <table>
+      <thead><tr><th class="th-name">专业名称</th><th>2024 最低分</th><th>2024 最低排位</th><th>2025 最低分</th><th>2025 最低排位</th><th>vs 9700 名</th></tr></thead>
+      <tbody>
+        <tr class="tr-cs"><td class="td-name"><strong>💻 计算机科学与技术（腾班）</strong> <span class="tag-cs">计</span></td><td>627</td><td>8,559</td><td>634</td><td>8,073</td><td class="mh">⚠️ 超你 1626 名</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>🤖 人工智能（IEEE荣誉班）</strong> <span class="tag-cs">计</span></td><td>628</td><td>8,237</td><td>631</td><td>9,195</td><td class="me">🟡 擦线！仅超 505 名</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>💻 计算机科学与技术（卓越班）</strong> <span class="tag-cs">计</span></td><td>624</td><td>9,642</td><td>628</td><td>10,257</td><td class="mp">✅ 稳偏冲</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>📡 电子信息工程（文华班）</strong> <span class="tag-ee">电</span></td><td>620</td><td>10,945</td><td>627</td><td>10,967</td><td class="mp">✅ 稳偏冲</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>💻 计算机类</strong>（含计科/软工/网安）<span class="tag-cs">计</span></td><td>618</td><td>12,064</td><td>622</td><td>12,952</td><td class="mp">✅ 稳妥</td></tr>
+        <tr><td class="td-name">金融科技</td><td>616</td><td>12,855</td><td>620</td><td>13,817</td><td class="mp">✅ 稳妥</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>📡 电子信息类</strong>（电信学院）<span class="tag-ee">电</span></td><td>610</td><td>15,759</td><td>618</td><td>15,345</td><td class="mp">✅ 稳妥</td></tr>
+        <tr class="tr-cs"><td class="td-name"><strong>🤖 自动化类</strong>（含自动化/机器人）<span class="tag-ee">电</span></td><td>608</td><td>17,193</td><td>615</td><td>16,710</td><td class="mp">✅ 保底</td></tr>
+        <tr><td class="td-name"><strong>⚡ 电气工程及其自动化</strong> <span class="tag-elec">气</span></td><td>607</td><td>17,813</td><td>614</td><td>17,430</td><td class="mp">✅ 保底</td></tr>
+        <tr><td class="td-name">机械设计制造及其自动化</td><td>605</td><td>18,743</td><td>613</td><td>18,058</td><td class="mp">✅ 保底</td></tr>
+        <tr><td class="td-name">信息与计算科学 <span class="tag-cs">计</span></td><td>605</td><td>18,743</td><td>613</td><td>18,058</td><td class="mp">✅ 保底</td></tr>
+        <tr><td class="td-name">数学与应用数学（师范）</td><td>604</td><td>19,409</td><td>612</td><td>18,663</td><td class="mp">✅ 保底</td></tr>
+        <tr><td class="td-name">物理学（师范）</td><td>603</td><td>20,107</td><td>611</td><td>19,280</td><td class="mp">✅ 保底</td></tr>
+        <tr><td class="td-name">新能源科学与工程</td><td>602</td><td>20,815</td><td>610</td><td>19,917</td><td class="mp">✅ 保底</td></tr>
+        <tr><td class="td-name">光电信息科学与工程 <span class="tag-ee">电</span></td><td>601</td><td>21,541</td><td>610</td><td>19,917</td><td class="mp">✅ 保底</td></tr>
+        <tr><td class="td-name">材料科学与工程</td><td>600</td><td>22,216</td><td>609</td><td>20,567</td><td class="mp">✅ 保底</td></tr>
+        <tr><td class="td-name">建筑类（5年制）</td><td>599</td><td>22,856</td><td>608</td><td>21,228</td><td class="mp">✅ 保底</td></tr>
+        <tr><td class="td-name">土木类</td><td>598</td><td>23,523</td><td>607</td><td>21,901</td><td class="mp">✅ 保底</td></tr>
+        <tr><td class="td-name">环境工程</td><td>597</td><td>24,171</td><td>606</td><td>22,588</td><td class="mp">✅ 保底</td></tr>
+        <tr><td class="td-name">化学（师范）</td><td>596</td><td>24,887</td><td>605</td><td>23,280</td><td class="mp">✅ 保底</td></tr>
+        <tr><td class="td-name">生物科学类</td><td>595</td><td>25,602</td><td>604</td><td>23,994</td><td class="mp">✅ 保底</td></tr>
+        <tr><td class="td-name">食品科学与工程类</td><td>594</td><td>26,338</td><td>603</td><td>24,721</td><td class="mp">✅ 保底</td></tr>
+        <tr><td class="td-name">交通运输类</td><td>593</td><td>27,115</td><td>602</td><td>25,468</td><td class="mp">✅ 保底</td></tr>
+        <tr><td class="td-name">地理信息科学</td><td>592</td><td>27,809</td><td>601</td><td>26,231</td><td class="mp">✅ 保底</td></tr>
+        <tr><td class="td-name">风景园林</td><td>591</td><td>28,643</td><td>600</td><td>27,012</td><td class="mp">✅ 保底</td></tr>
+      </tbody>
+    </table>
+    <p class="note">* 深大 2025 普通类全校最低分 594 / 31703 名；2024 最低 588 / 30502 名。腾班和 IEEE 荣誉班竞争激烈，需注意。以上数据为物理类普通批，不含地方专项。</p>
+  </div>
+</div>
+<!-- ===== 五校计算机/电子/电气对比 ===== -->
+<div class="section" id="duibi">
+  <div class="sec-hd"><h2>📊 五校 · 计算机/电子/电气 对比总览</h2><span class="sub">按 632 分可达性排序</span></div>
+  <div class="t-wrap">
+    <table>
+      <thead><tr><th class="th-name">学校</th><th>计算机类 2025</th><th>计算机类 2024</th><th>电子信息类 2025</th><th>电子信息类 2024</th><th>电气类 2025</th><th>电气类 2024</th><th>推荐度</th></tr></thead>
+      <tbody>
+        <tr><td class="td-name">华南理工大学</td><td class="mi">635 ❌</td><td class="mi">637 ❌</td><td class="mh">633 ⚠️</td><td class="mh">631 ⚠️</td><td class="me">632 🟡</td><td class="mp">628 ✅</td><td>⭐⭐⭐⭐ 冲刺</td></tr>
+        <tr><td class="td-name">四川大学</td><td class="mh">629 ⚠️</td><td class="mp">627 ✅</td><td class="mp">627 ✅</td><td class="mp">624 ✅</td><td class="mp">625 ✅</td><td class="mp">622 ✅</td><td>⭐⭐⭐⭐ 冲刺</td></tr>
+        <tr><td class="td-name">西南交通大学</td><td class="mp">612 ✅</td><td class="mp">596 ✅</td><td class="mp">618 ✅</td><td class="mp">598 ✅</td><td class="mp">616 ✅</td><td class="mp">598 ✅</td><td>⭐⭐⭐⭐⭐ 稳妥</td></tr>
+        <tr><td class="td-name">深圳大学（普通班）</td><td class="mp">622 ✅</td><td class="mp">618 ✅</td><td class="mp">618 ✅</td><td class="mp">610 ✅</td><td class="mp">614 ✅</td><td class="mp">607 ✅</td><td>⭐⭐⭐⭐⭐ 保底</td></tr>
+        <tr><td class="td-name">深圳大学（腾班/IEEE）</td><td class="mh">634/631 ⚠️</td><td class="mh">627/628 ⚠️</td><td class="mh">627 ⚠️</td><td class="mh">620 ⚠️</td><td>-</td><td>-</td><td>⭐⭐⭐ 极限</td></tr>
+        <tr><td class="td-name">电子科技大学</td><td class="mi">651 ❌</td><td class="mi">644 ❌</td><td class="mi">651 ❌</td><td class="mi">645 ❌</td><td class="mi">648 ❌</td><td class="mi">643 ❌</td><td>❌ 不推荐</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sum-grid">
+    <div class="sc" style="border-left:4px solid var(--danger);">
+      <h3>🔴 冲刺层（华工）</h3>
+      <ul>
+        <li>⚡ <strong>电气类 632</strong> — 同分！极限擦线</li>
+        <li>📡 <strong>信息工程 633</strong> — 差 1 分</li>
+        <li>🔬 <strong>电子科学 634</strong> — 差 2 分</li>
+        <li>💻 <strong>计算机类 635</strong> — 差 3 分</li>
+        <li>🤖 <strong>自动化 626</strong> — ✅ 超 6 分</li>
+        <li>💻 <strong>软件工程 627</strong> — ✅ 超 5 分</li>
+      </ul>
+    </div>
+    <div class="sc" style="border-left:4px solid var(--warn);">
+      <h3>🟡 冲刺层（川大）</h3>
+      <ul>
+        <li>💻 <strong>计算机类 629</strong> — 差 3 分！</li>
+        <li>📡 <strong>电子信息类 627</strong> — ✅ 超 5 分</li>
+        <li>⚡ <strong>电气类 625</strong> — ✅ 超 7 分</li>
+        <li>🔒 <strong>网安 620</strong> — ✅ 超 12 分</li>
+        <li>🏫 985 平台，综合强校</li>
+      </ul>
+    </div>
+    <div class="sc" style="border-left:4px solid var(--ok);">
+      <h3>🟢 稳妥层（西南交大）</h3>
+      <ul>
+        <li>📡 <strong>电子信息类 618</strong> / 15408 名</li>
+        <li>⚡ <strong>电气 616</strong> / 16493 名</li>
+        <li>📶 <strong>通信 615</strong> / 17051 名</li>
+        <li>💻 <strong>计算机 612</strong> / 18818 名</li>
+        <li>🤖 <strong>人工智能 614</strong> / 17622 名</li>
+        <li>🏆 交通 A+，211 强校</li>
+      </ul>
+    </div>
+    <div class="sc" style="border-left:4px solid #059669;">
+      <h3>🔵 保底层（深大）</h3>
+      <ul>
+        <li>⚠️ 腾班 634 / IEEE 631 — 极限</li>
+        <li>✅ <strong>计算机类 622</strong> / 12952 名</li>
+        <li>✅ <strong>电子信息类 618</strong> / 15345</li>
+        <li>✅ <strong>自动化类 615</strong> / 16710</li>
+        <li>✅ <strong>电气 614</strong> / 17430</li>
+        <li>📍 珠三角就业优势明显</li>
+      </ul>
+    </div>
+    <div class="sc" style="border-left:4px solid #9ca3af;">
+      <h3>❌ 不推荐（电科大）</h3>
+      <ul>
+        <li>2024 最低线 <strong>640</strong></li>
+        <li>2025 最低线 <strong>648</strong></li>
+        <li>计算机/电子 <strong>651+</strong></li>
+        <li>差 8–33 分，完全没戏</li>
+        <li>建议不留，节省志愿位</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="t-wrap">
+    <h3 id="zhunyuan">📋 推荐志愿顺序（共 12 个 · 按优先级排列）</h3>
+    <table>
+      <thead><tr><th style="width:40px;">序号</th><th style="width:70px;">层级</th><th>学校</th><th>专业名称</th><th>2025 最低分</th><th>2025 排位</th><th>vs 9700名</th><th>录取概率</th></tr></thead>
+      <tbody>
+        <!-- 冲刺档：录取难度 ≥ 你的排位 -->
+        <tr class="tr-highlight"><td><strong>1</strong></td><td><span class="badge b-rush">冲刺</span></td><td>华南理工大学</td><td class="td-name"><strong>⚡ 电气类</strong> <span class="tag-elec">气</span></td><td><span class="sm">632</span></td><td>≈9400</td><td class="me">🟡 同分段</td><td>≈50% 极限擦线</td></tr>
+        <tr><td><strong>2</strong></td><td><span class="badge b-rush">冲刺</span></td><td>华南理工大学</td><td class="td-name"><strong>📡 信息工程</strong> <span class="tag-ee">电</span></td><td><span class="sg">633</span></td><td>≈9200</td><td class="mi">❌ 超你500名</td><td>≈35% 差1分</td></tr>
+        <tr><td><strong>3</strong></td><td><span class="badge b-rush">冲刺</span></td><td>深圳大学</td><td class="td-name"><strong>🤖 人工智能（IEEE荣誉班）</strong> <span class="tag-cs">计</span></td><td><span class="sg">631</span></td><td>9,195</td><td class="mi">❌ 超你505名</td><td>≈35% 排位不够</td></tr>
+        <tr><td><strong>4</strong></td><td><span class="badge b-rush">冲刺</span></td><td>四川大学</td><td class="td-name"><strong>💻 计算机类</strong> <span class="tag-cs">计</span></td><td><span class="sg">629</span></td><td>≈10500</td><td class="mh">⚠️ 差3分/800名</td><td>≈45% 可冲刺</td></tr>
+
+        <!-- 稳妥冲刺档：分数有余但需看大小年 -->
+        <tr class="tr-highlight"><td><strong>5</strong></td><td><span class="badge b-stable">稳妥冲刺</span></td><td>华南理工大学</td><td class="td-name"><strong>💻 软件工程</strong> <span class="tag-cs">计</span></td><td><span class="so">627</span></td><td>≈11500</td><td class="mp">✅ 超1800名</td><td>≈60% 较稳</td></tr>
+        <tr><td><strong>6</strong></td><td><span class="badge b-stable">稳妥冲刺</span></td><td>四川大学</td><td class="td-name"><strong>📡 电子信息类</strong> <span class="tag-ee">电</span></td><td><span class="so">627</span></td><td>≈11500</td><td class="mp">✅ 超1800名</td><td>≈65% 较稳</td></tr>
+        <tr><td><strong>7</strong></td><td><span class="badge b-stable">稳妥冲刺</span></td><td>华南理工大学</td><td class="td-name"><strong>🤖 自动化</strong> <span class="tag-ee">电</span></td><td><span class="so">626</span></td><td>≈11800</td><td class="mp">✅ 超2100名</td><td>≈65% 较稳</td></tr>
+
+        <!-- 稳妥档：211高校，排位大幅领先 -->
+        <tr class="tr-highlight"><td><strong>8</strong></td><td><span class="badge b-safe">稳妥</span></td><td>西南交通大学</td><td class="td-name"><strong>📡 电子信息类</strong> <span class="tag-ee">电</span></td><td><span class="so">618</span></td><td>15,408</td><td class="mp">✅ 超5700名</td><td>≈90% 稳妥</td></tr>
+        <tr><td><strong>9</strong></td><td><span class="badge b-safe">稳妥</span></td><td>西南交通大学</td><td class="td-name"><strong>⚡ 电气工程及其自动化</strong> <span class="tag-elec">气</span></td><td><span class="so">616</span></td><td>16,493</td><td class="mp">✅ 超6800名</td><td>≈90% 稳妥</td></tr>
+        <tr><td><strong>10</strong></td><td><span class="badge b-safe">稳妥</span></td><td>西南交通大学</td><td class="td-name"><strong>💻 计算机类</strong> <span class="tag-cs">计</span></td><td><span class="so">612</span></td><td>18,818</td><td class="mp">✅ 超9100名</td><td>≈95% 稳进</td></tr>
+
+        <!-- 保底档 -->
+        <tr class="tr-highlight"><td><strong>11</strong></td><td><span class="badge b-safe">保底</span></td><td>深圳大学</td><td class="td-name"><strong>💻 计算机类</strong>（含计科/软工）<span class="tag-cs">计</span></td><td><span class="so">622</span></td><td>12,952</td><td class="mp">✅ 超3200名</td><td>≈95% 稳进</td></tr>
+        <tr><td><strong>12</strong></td><td><span class="badge b-safe">保底</span></td><td>深圳大学</td><td class="td-name"><strong>📡 电子信息类</strong>（电信学院）<span class="tag-ee">电</span></td><td><span class="so">618</span></td><td>15,345</td><td class="mp">✅ 超5600名</td><td>≈97% 稳进</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:20px;">💡 填报策略说明</h3>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:12px; font-size:13px;">
+      <div style="background:#fef2f2; padding:12px; border-radius:6px; border-left:4px solid #dc2626;">
+        <strong>🔴 冲刺档（#1–4）</strong><br>
+        华工电气(同分段)、华工信息工程(−1分)、深大IEEE(排位差505)、川大计算机(−3分)。<strong>排位都在你附近，都有机会但都不保证</strong>。华工电气排位最接近，概率最高。
+      </div>
+      <div style="background:#fffbeb; padding:12px; border-radius:6px; border-left:4px solid #f59e0b;">
+        <strong>🟡 稳妥冲刺档（#5–7）</strong><br>
+        华工软件/自动化、川大电子信息。排位超你1800-2100名，有安全余量但非绝对保险。华工自动化2024年也曾627分。
+      </div>
+      <div style="background:#ecfdf5; padding:12px; border-radius:6px; border-left:4px solid #16a34a;">
+        <strong>🟢 稳妥档（#8–10）西南交大</strong><br>
+        211强校，电子信息/电气/计算机是王牌工科。排位超你5700-9100名，<strong>基本稳进</strong>。交通A+学科全国第一，就业认可度高。
+      </div>
+      <div style="background:#e8f0fe; padding:12px; border-radius:6px; border-left:4px solid #1a56db;">
+        <strong>🔵 保底档（#11–12）深大普通班</strong><br>
+        深大计算机类/电子信息类（普通班，非腾班非IEEE）。珠三角就业强校，排位超3200-5600名，<strong>绝对稳进</strong>。
+      </div>
+    </div>
+    <p class="note" style="margin-top:12px;">⚠️ 注：电子科技大学已从方案中删除（最低648分，差16分以上）。深圳大学腾班(634分/8073名)同样够不到，不列入。备选可考虑中南大学、东北大学等中间985的计算机方向。</p>
+  </div>
+</div>
+
+<div class="footer">
+  <p>数据来源：华南理工大学招生网 (admission.scut.edu.cn) · 四川大学招生网 (zjczs.scu.edu.cn) · 电子科技大学招生网 (chaxun.uestc.edu.cn)</p>
+  <p>西南交通大学招生网 (cjcx.swjtu.edu.cn) · 深圳大学招生网 (zs.szu.edu.cn)</p>
+  <p>⚠️ 排位数据需结合广东省教育考试院一分一段表交叉验证 ｜ 2026-06-24 整理 ｜ 仅供参考</p>
+</div>
+
+</div>
+</body>
+</html>
