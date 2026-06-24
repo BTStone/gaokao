@@ -85,7 +85,7 @@
   .nav-side .nv-sub { font-size: 10px; color: var(--g500); }
 
   @media (max-width: 1200px) {
-    .nav-side { position: static; transform: none; width: auto; margin: 0 20px 16px; display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 12px; background: var(--g50); border-radius: 8px; flex-direction: row; }
+    .nav-side { position: sticky; top: 0; transform: none; width: auto; margin: 0 0 16px; display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 12px; background: rgba(255,255,255,.95); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-radius: 8px; flex-direction: row; z-index: 999; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
     .nav-side a { padding: 4px 10px; border-left: none; border-radius: 14px; font-size: 11px; }
     .nav-side a.nv-duibi { border-top: none; margin-top: 0; padding-top: 4px; }
     .nav-side .nv-dot { display: none; }
@@ -121,7 +121,7 @@
     .sc ul { font-size: 12px; }
     .sc li { padding: 2px 0; }
 
-    .nav-side { margin: 0 10px 12px; padding: 6px 8px; gap: 3px; }
+    .nav-side { margin: 0 0 10px; padding: 6px 8px; gap: 3px; }
     .nav-side a { padding: 3px 8px; font-size: 10px; border-radius: 12px; }
     .nav-side .nv-sub { font-size: 9px; }
 
@@ -186,7 +186,7 @@
     .sc h3 { font-size: 12px; }
     .sc ul { font-size: 11px; }
 
-    .nav-side { margin: 0 6px 10px; padding: 5px 6px; gap: 2px; border-radius: 6px; }
+    .nav-side { margin: 0 0 8px; padding: 5px 6px; gap: 2px; border-radius: 6px; }
     .nav-side a { padding: 3px 7px; font-size: 9px; border-radius: 10px; }
     .nav-side .nv-sub { display: none; }
     .nav-side .nv-label { line-height: 1.1; }
